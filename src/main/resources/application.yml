@@ -5,6 +5,14 @@ server:
 spring:
   application:
     name: cloud_pichub
+  profiles:
+    active: local
+  # 开放更大的文件上传体积
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+
 
 # MyBatis-Plus配置
 mybatis-plus:
