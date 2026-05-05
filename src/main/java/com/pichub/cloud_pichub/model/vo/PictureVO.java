@@ -95,6 +95,12 @@ public class PictureVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 缩略图 url
+     */
+    private String thumbnailUrl;
+
+
+    /**
      * 封装类转对象
      */
     public static Picture voToObj(PictureVO pictureVO) {
