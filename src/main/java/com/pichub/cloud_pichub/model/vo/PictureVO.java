@@ -127,5 +127,11 @@ public class PictureVO implements Serializable {
         pictureVO.setTags(JSONUtil.toList(picture.getTags(), String.class));
         return pictureVO;
     }
+
+    /**
+     * 空间 id
+     */
+    private Long spaceId;
+
 }
 

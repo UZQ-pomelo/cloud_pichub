@@ -20,5 +20,11 @@ public class PictureUploadByBatchRequest {
      */
     private String namePrefix;
 
+    /**
+     * 空间 id
+     */
+    private Long spaceId;
+
+
 }
 

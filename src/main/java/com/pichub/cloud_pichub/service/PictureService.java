@@ -2,10 +2,7 @@ package com.pichub.cloud_pichub.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pichub.cloud_pichub.model.dto.picture.PictureQueryRequest;
-import com.pichub.cloud_pichub.model.dto.picture.PictureReviewRequest;
-import com.pichub.cloud_pichub.model.dto.picture.PictureUploadByBatchRequest;
-import com.pichub.cloud_pichub.model.dto.picture.PictureUploadRequest;
+import com.pichub.cloud_pichub.model.dto.picture.*;
 import com.pichub.cloud_pichub.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pichub.cloud_pichub.model.entity.User;
@@ -33,6 +30,10 @@ public interface PictureService extends IService<Picture> {
     PictureVO uploadPicture(Object inputSource,
                             PictureUploadRequest pictureUploadRequest,
                             User loginUser);
+
+    void deletePicture(long pictureId, User loginUser);
+
+    void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
 
     QueryWrapper<Picture> getQueryWrapper(PictureQueryRequest pictureQueryRequest);
 
@@ -66,4 +67,6 @@ public interface PictureService extends IService<Picture> {
 
     @Async
     void clearPictureFile(Picture oldPicture);
+
+    void checkPictureAuth(User loginUser, Picture picture);
 }

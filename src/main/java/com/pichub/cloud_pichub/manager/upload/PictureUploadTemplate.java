@@ -114,7 +114,7 @@ public abstract class PictureUploadTemplate {
         // 设置图片为压缩后的地址
         uploadPictureResult.setUrl(cosClientConfig.getHost() + "/" + compressedCiObject.getKey());
         // 设置缩略图
-        uploadPictureResult.setUrl(cosClientConfig.getHost() + "/" + thumbnailCiObject.getKey());
+        uploadPictureResult.setThumbnailUrl(cosClientConfig.getHost() + "/" + thumbnailCiObject.getKey());
         return uploadPictureResult;
     }
 

@@ -24,5 +24,11 @@ public class PictureReviewRequest implements Serializable {
 
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 空间 id
+     */
+    private Long spaceId;
+
 }
 
