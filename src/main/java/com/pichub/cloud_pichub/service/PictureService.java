@@ -2,6 +2,7 @@ package com.pichub.cloud_pichub.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pichub.cloud_pichub.api.aliyunai.model.CreateOutPaintingTaskResponse;
 import com.pichub.cloud_pichub.model.dto.picture.*;
 import com.pichub.cloud_pichub.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -76,4 +77,6 @@ public interface PictureService extends IService<Picture> {
 
     @Transactional(rollbackFor = Exception.class)
     void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
+
+    CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
 }
