@@ -9,6 +9,7 @@ import com.pichub.cloud_pichub.constant.UserConstant;
 import com.pichub.cloud_pichub.exception.BusinessException;
 import com.pichub.cloud_pichub.exception.ErrorCode;
 import com.pichub.cloud_pichub.exception.ThrowUtils;
+import com.pichub.cloud_pichub.manager.auth.SpaceUserAuthManager;
 import com.pichub.cloud_pichub.model.dto.space.*;
 import com.pichub.cloud_pichub.model.entity.Space;
 import com.pichub.cloud_pichub.model.entity.User;
@@ -35,6 +36,9 @@ public class SpaceController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private SpaceUserAuthManager spaceUserAuthManager;
 
     /**
      * 创建私有空间（每个用户最多一个）
@@ -144,15 +148,17 @@ public class SpaceController {
     @GetMapping("/get/vo")
     public BaseResponse<SpaceVO> getSpaceVOById(long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+        // 查询数据库
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
-        // 非管理员只能查看自己的空间
+        SpaceVO spaceVO = spaceService.getSpaceVO(space, request);
         User loginUser = userService.getLoginUser(request);
-        if (!loginUser.getId().equals(space.getUserId()) && !userService.isAdmin(loginUser)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
-        return ResultUtils.success(SpaceVO.objToVo(space));
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
+        spaceVO.setPermissionList(permissionList);
+        // 获取封装类
+        return ResultUtils.success(spaceVO);
     }
+
 
     /**
      * 分页获取空间列表（仅管理员）

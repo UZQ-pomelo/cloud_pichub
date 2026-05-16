@@ -1,0 +1,45 @@
+### ===================================================
+### 空间接口测试 — getSpaceVOById 权限校验
+### ===================================================
+
+### 1.1 获取私有空间(空间创建人)-预期成功
+# 验证：HTTP 200，data.permissionList 应包含完整管理权限
+GET http://localhost:8123/api/space/get/vo?id={{privateSpaceId}}
+Cookie: {{spaceCreatorCookie}}
+
+### 1.2 获取私有空间(管理员)-预期成功
+# 验证：HTTP 200，系统管理员对所有空间有完整权限
+GET http://localhost:8123/api/space/get/vo?id={{privateSpaceId}}
+Cookie: {{adminCookie}}
+
+### 1.3 获取私有空间(非创建人)-预期失败
+# 验证：HTTP 非200，应返回 NO_AUTH_ERROR
+# 说明：commonUser 不是 privateSpaceId 的创建者，也没有被邀请加入
+GET http://localhost:8123/api/space/get/vo?id={{privateSpaceId}}
+Cookie: {{commonUserCookie}}
+
+### 1.4 获取企业空间(空间创建人)-预期成功
+# 验证：HTTP 200，data.permissionList 包含 admin 权限
+GET http://localhost:8123/api/space/get/vo?id={{teamSpaceId}}
+Cookie: {{spaceCreatorCookie}}
+
+### 1.5 获取企业空间(协作者)-预期成功
+# 验证：HTTP 200，data.permissionList 包含 editor 权限
+GET http://localhost:8123/api/space/get/vo?id={{teamSpaceId}}
+Cookie: {{editorCookie}}
+
+### 1.6 获取企业空间(只读用户)-预期成功
+# 验证：HTTP 200，data.permissionList 仅包含 viewer 权限
+GET http://localhost:8123/api/space/get/vo?id={{teamSpaceId}}
+Cookie: {{viewerCookie}}
+
+### 1.7 获取企业空间(非成员)-预期失败
+# 验证：HTTP 非200，应返回 NO_AUTH_ERROR
+# 说明：commonUser 不是 teamSpaceId 的成员
+GET http://localhost:8123/api/space/get/vo?id={{teamSpaceId}}
+Cookie: {{commonUserCookie}}
+
+### 1.8 获取团队空间(未登录)-预期失败
+# 验证：HTTP 非200，应返回未登录错误
+# 说明：未登录用户不能查看任何空间详情
+GET http://localhost:8123/api/space/get/vo?id={{teamSpaceId}}
