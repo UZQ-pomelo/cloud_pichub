@@ -526,12 +526,12 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         // 1. 校验参数
         ThrowUtils.throwIf(spaceId == null || StrUtil.isBlank(picColor), ErrorCode.PARAMS_ERROR);
         ThrowUtils.throwIf(loginUser == null, ErrorCode.NO_AUTH_ERROR);
-        // 2. 校验空间权限
+        // 2. 校验空间权限 — 已由 Controller 层 @SaSpaceCheckPermission 接管
         Space space = spaceService.getById(spaceId);
         ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
-        if (!loginUser.getId().equals(space.getUserId())) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间访问权限");
-        }
+        //if (!loginUser.getId().equals(space.getUserId())) {
+        //    throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间访问权限");
+        //}
         // 3. 查询该空间下所有图片（必须有主色调）
         List<Picture> pictureList = this.lambdaQuery()
                 .eq(Picture::getSpaceId, spaceId)
