@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pichub.cloud_pichub.exception.BusinessException;
 import com.pichub.cloud_pichub.exception.ErrorCode;
 import com.pichub.cloud_pichub.exception.ThrowUtils;
-import com.pichub.cloud_pichub.manager.sharding.DynamicShardingManager;
 import com.pichub.cloud_pichub.model.dto.space.SpaceAddRequest;
 import com.pichub.cloud_pichub.model.dto.space.SpaceQueryRequest;
 import com.pichub.cloud_pichub.model.entity.Space;
@@ -25,12 +24,11 @@ import com.pichub.cloud_pichub.mapper.SpaceMapper;
 import com.pichub.cloud_pichub.service.SpaceUserService;
 import com.pichub.cloud_pichub.service.UserService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,9 +50,6 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
     private UserService userService;
     @Resource
     private SpaceUserService spaceUserService;
-//    @Resource
-//    @Lazy
-//    private DynamicShardingManager dynamicShardingManager;
 
     private final Map<Long, Object> lockMap = new ConcurrentHashMap<>();
 
@@ -159,8 +154,6 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
                         result = spaceUserService.save(spaceUser);
                         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建团队成员记录失败");
                     }
-                    // 创建分表
-                    //dynamicShardingManager.createSpacePictureTable(space);
                     // 返回新写入的数据 id
                     return space.getId();
                 });

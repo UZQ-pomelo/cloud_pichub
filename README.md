@@ -1,17 +1,16 @@
-# 🖼️ 智能协同云图库
+# 🖼️ CloudPicHub 智能图片管理平台
 
 > 集成 AI 图像处理与多人实时协同编辑的云端图片管理平台
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.6-brightgreen?style=flat&logo=springboot)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-brightgreen?style=flat&logo=springboot)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17-orange?style=flat&logo=java)](https://www.java.com/)
 [![MyBatis Plus](https://img.shields.io/badge/MyBatis%20Plus-3.5.9-blue?style=flat)](https://baomidou.com/)
-[![ShardingSphere](https://img.shields.io/badge/ShardingSphere-5.2.0-red?style=flat)](https://shardingsphere.apache.org/)
 [![Sa-Token](https://img.shields.io/badge/Sa--Token-1.39.0-ff69b4?style=flat)](https://sa-token.cc/)
 [![Redis](https://img.shields.io/badge/Redis-缓存-red?style=flat&logo=redis)](https://redis.io/)
 [![WebSocket](https://img.shields.io/badge/WebSocket-实时协作-9cf?style=flat)](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
 [![腾讯云COS](https://img.shields.io/badge/存储-腾讯云COS-blue?style=flat)](https://cloud.tencent.com/product/cos)
 [![阿里云AI](https://img.shields.io/badge/AI-阿里云DashScope-purple?style=flat)](https://dashscope.aliyun.com/)
-[![Knife4j](https://img.shields.io/badge/API文档-Knife4j-brightgreen?style=flat)](https://doc.xiaominfo.com/)
+[![SpringDoc](https://img.shields.io/badge/API文档-SpringDoc%20OpenAPI-green?style=flat)](https://springdoc.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat)](LICENSE)
 
 ---
@@ -49,7 +48,7 @@
 - **Spring Session + Redis** 分布式会话支持
 
 ### ⚡ 技术亮点
-- **ShardingSphere 分库分表**：按空间 ID 动态分表，支持海量图片存储
+- **分库分表（规划中）**：当前单体阶段暂用单表，后续在 `picture-service` 中按 `spaceId` 固定分片
 - **多级缓存**：Caffeine 本地缓存 + Redis 分布式缓存，减少数据库压力
 - **腾讯云 COS**：图片文件存储在腾讯云对象存储，高可用低成本
 
@@ -59,17 +58,16 @@
 
 | 类别 | 技术 | 版本 | 说明 |
 |------|------|------|------|
-| 基础框架 | Spring Boot | 2.7.6 | 主框架 |
+| 基础框架 | Spring Boot | 3.4.5 | 主框架 |
 | 开发语言 | Java | 17 | - |
 | 数据访问 | MyBatis Plus | 3.5.9 | ORM + 分页 |
-| 分库分表 | ShardingSphere | 5.2.0 | 按空间动态分表 |
 | 权限认证 | Sa-Token | 1.39.0 | RBAC 权限 |
 | 缓存 | Redis + Caffeine | - | 分布式 + 本地两级缓存 |
 | 会话管理 | Spring Session + Redis | - | 分布式会话 |
 | 对象存储 | 腾讯云 COS | 5.6.227 | 图片文件存储 |
 | AI 服务 | 阿里云 DashScope | - | AI 图像扩图 |
 | 实时通信 | Spring WebSocket | - | 多人协同编辑 |
-| 接口文档 | Knife4j | 4.4.0 | Swagger 增强文档 |
+| 接口文档 | SpringDoc OpenAPI | 2.7.0 | OpenAPI 3 / Swagger UI |
 | 工具库 | Hutool | 5.8.26 | 通用工具 |
 | HTML 解析 | Jsoup | 1.15.3 | 爬虫抓取图片 |
 
@@ -84,7 +82,6 @@ src/main/java/com/pichub/cloud_pichub/
 │   └── imagesearch/       # 以图搜图服务
 ├── manager/
 │   ├── auth/              # Sa-Token 权限管理器
-│   ├── sharding/          # 自定义分表算法（按 spaceId 动态路由）
 │   └── websocket/         # WebSocket 协同编辑处理器
 ├── controller/            # REST 接口层（Picture/Space/SpaceAnalyze/User 等）
 ├── service/               # 业务逻辑层
@@ -167,7 +164,8 @@ mvn spring-boot:run
 ```
 
 启动后访问：
-- **接口文档**：`http://localhost:8123/api/doc.html`
+- **接口文档**：`http://localhost:8123/api/swagger-ui.html`
+- **OpenAPI JSON**：`http://localhost:8123/api/v3/api-docs`
 - **API 前缀**：`http://localhost:8123/api`
 
 ---
@@ -194,11 +192,10 @@ mvn spring-boot:run
 - 握手拦截器 `WsHandshakeInterceptor` 在连接建立前校验用户身份和图片权限
 - 编辑状态由 `ConcurrentHashMap` 内存管理，支持水平扩展时可通过 Redis 改造
 
-### 分表策略
-- 自定义 `PictureShardingAlgorithm`，按 `spaceId` 动态路由
-- `spaceId = null` → 写入公共图库基础表 `picture`
-- `spaceId = 100` → 写入分表 `picture_100`
-- 业务层通过 `SpaceService` 在创建空间时动态 `CREATE TABLE picture_{spaceId}`
+### 分表策略（规划中）
+- 当前单体阶段使用单表 `picture`
+- 后续在 `picture-service` 中按 `spaceId % 32` 固定分片，路由到 `picture_0..31`
+- 不使用“每个空间一张表”的动态 DDL，避免多实例配置不一致
 
 ---
 

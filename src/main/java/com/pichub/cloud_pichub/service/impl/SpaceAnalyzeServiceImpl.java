@@ -18,7 +18,7 @@ import com.pichub.cloud_pichub.service.SpaceService;
 import com.pichub.cloud_pichub.service.UserService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

@@ -2,16 +2,14 @@ package com.pichub.cloud_pichub.config;
 
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
 
 /**
  * 包装请求，使 InputStream 可以重复读取
- *
- * @author pine
  */
 @Slf4j
 public class RequestWrapper extends HttpServletRequestWrapper {
@@ -38,12 +36,12 @@ public class RequestWrapper extends HttpServletRequestWrapper {
         return new ServletInputStream() {
             @Override
             public boolean isFinished() {
-                return false;
+                return byteArrayInputStream.available() == 0;
             }
 
             @Override
             public boolean isReady() {
-                return false;
+                return true;
             }
 
             @Override

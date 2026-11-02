@@ -41,8 +41,8 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -297,7 +297,7 @@ public class PictureController {
         // 构建缓存 key
         String queryCondition = JSONUtil.toJsonStr(pictureQueryRequest);
         String hashKey = DigestUtils.md5DigestAsHex(queryCondition.getBytes());
-        String cacheKey = "yupicture:listPictureVOByPage:" + hashKey;
+        String cacheKey = "cloud-pichub:listPictureVOByPage:" + hashKey;
 
         // 1. 查询本地缓存（Caffeine）
         String cachedValue = LOCAL_CACHE.getIfPresent(cacheKey);

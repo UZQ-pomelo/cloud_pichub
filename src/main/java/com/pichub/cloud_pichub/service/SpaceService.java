@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.pichub.cloud_pichub.model.entity.User;
 import com.pichub.cloud_pichub.model.vo.SpaceVO;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
 * @author Yuki

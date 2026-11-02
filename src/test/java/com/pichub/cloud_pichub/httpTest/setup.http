@@ -1,0 +1,391 @@
+############################################################
+# 测试环境初始化脚本
+# 按顺序执行所有请求，每个请求的响应处理器会提取并保存 ID/Cookie
+# 执行完毕后，将控制台打印的 JSON 复制到 http-client.env.json
+############################################################
+
+### ============================================================
+### 第一阶段：注册所有用户（已存在会返回错误，可忽略继续执行）
+### ============================================================
+
+### 1.1 注册管理员
+POST http://localhost:8123/api/user/register
+Content-Type: application/json
+
+{
+  "userAccount": "admin",
+  "userPassword": "12345678",
+  "checkPassword": "12345678"
+}
+
+### 1.2 注册空间创建者
+POST http://localhost:8123/api/user/register
+Content-Type: application/json
+
+{
+  "userAccount": "spaceCreator",
+  "userPassword": "12345678",
+  "checkPassword": "12345678"
+}
+
+### 1.3 注册协作者
+POST http://localhost:8123/api/user/register
+Content-Type: application/json
+
+{
+  "userAccount": "editor",
+  "userPassword": "12345678",
+  "checkPassword": "12345678"
+}
+
+### 1.4 注册只读者
+POST http://localhost:8123/api/user/register
+Content-Type: application/json
+
+{
+  "userAccount": "viewer",
+  "userPassword": "12345678",
+  "checkPassword": "12345678"
+}
+
+### 1.5 注册普通用户
+POST http://localhost:8123/api/user/register
+Content-Type: application/json
+
+{
+  "userAccount": "commonUser",
+  "userPassword": "12345678",
+  "checkPassword": "12345678"
+}
+
+### 1.6 注册待添加用户
+POST http://localhost:8123/api/user/register
+Content-Type: application/json
+
+{
+  "userAccount": "addUser",
+  "userPassword": "12345678",
+  "checkPassword": "12345678"
+}
+
+
+### ============================================================
+### 第二阶段：登录所有用户，提取 Cookie 和 userId
+### ============================================================
+
+### 2.1 管理员登录
+POST http://localhost:8123/api/user/login
+Content-Type: application/json
+
+{
+  "userAccount": "admin",
+  "userPassword": "12345678"
+}
+
+> {%
+    var cookies = response.headers['Set-Cookie'].toString();
+    var session = cookies.match(/SESSION=([^;]+)/)[1];
+    var satoken = cookies.match(/satoken=([^;]+)/)[1];
+    client.global.set("adminCookie", "SESSION=" + session + "; satoken=" + satoken);
+    client.log("adminCookie: " + client.global.get("adminCookie"));
+%}
+
+### 2.2 空间创建者登录
+POST http://localhost:8123/api/user/login
+Content-Type: application/json
+
+{
+  "userAccount": "spaceCreator",
+  "userPassword": "12345678"
+}
+
+> {%
+    var cookies = response.headers['Set-Cookie'].toString();
+    var session = cookies.match(/SESSION=([^;]+)/)[1];
+    var satoken = cookies.match(/satoken=([^;]+)/)[1];
+    client.global.set("spaceCreatorCookie", "SESSION=" + session + "; satoken=" + satoken);
+    client.log("spaceCreatorCookie: " + client.global.get("spaceCreatorCookie"));
+%}
+
+### 2.3 协作者登录（记录其 userId）
+POST http://localhost:8123/api/user/login
+Content-Type: application/json
+
+{
+  "userAccount": "editor",
+  "userPassword": "12345678"
+}
+
+> {%
+    var cookies = response.headers['Set-Cookie'].toString();
+    var session = cookies.match(/SESSION=([^;]+)/)[1];
+    var satoken = cookies.match(/satoken=([^;]+)/)[1];
+    client.global.set("editorCookie", "SESSION=" + session + "; satoken=" + satoken);
+    client.global.set("editorUserId", JSON.parse(response.body.toString()).data.id.toString());
+    client.log("editorCookie: " + client.global.get("editorCookie"));
+    client.log("editorUserId: " + client.global.get("editorUserId"));
+%}
+
+### 2.4 只读者登录（记录其 userId）
+POST http://localhost:8123/api/user/login
+Content-Type: application/json
+
+{
+  "userAccount": "viewer",
+  "userPassword": "12345678"
+}
+
+> {%
+    var cookies = response.headers['Set-Cookie'].toString();
+    var session = cookies.match(/SESSION=([^;]+)/)[1];
+    var satoken = cookies.match(/satoken=([^;]+)/)[1];
+    client.global.set("viewerCookie", "SESSION=" + session + "; satoken=" + satoken);
+    client.global.set("viewerUserId", JSON.parse(response.body.toString()).data.id.toString());
+    client.log("viewerCookie: " + client.global.get("viewerCookie"));
+    client.log("viewerUserId: " + client.global.get("viewerUserId"));
+%}
+
+### 2.5 普通用户登录
+POST http://localhost:8123/api/user/login
+Content-Type: application/json
+
+{
+  "userAccount": "commonUser",
+  "userPassword": "12345678"
+}
+
+> {%
+    var cookies = response.headers['Set-Cookie'].toString();
+    var session = cookies.match(/SESSION=([^;]+)/)[1];
+    var satoken = cookies.match(/satoken=([^;]+)/)[1];
+    client.global.set("commonUserCookie", "SESSION=" + session + "; satoken=" + satoken);
+    client.log("commonUserCookie: " + client.global.get("commonUserCookie"));
+%}
+
+### 2.6 待添加用户登录（记录其 userId）
+POST http://localhost:8123/api/user/login
+Content-Type: application/json
+
+{
+  "userAccount": "addUser",
+  "userPassword": "12345678"
+}
+
+> {%
+    var cookies = response.headers['Set-Cookie'].toString();
+    var session = cookies.match(/SESSION=([^;]+)/)[1];
+    var satoken = cookies.match(/satoken=([^;]+)/)[1];
+    client.global.set("addUserCookie", "SESSION=" + session + "; satoken=" + satoken);
+    client.global.set("addUserId", JSON.parse(response.body.toString()).data.id.toString());
+    client.log("addUserId: " + client.global.get("addUserId"));
+%}
+
+
+### ============================================================
+### 第三阶段：创建空间
+### ============================================================
+
+### 3.1 创建私有空间（管理员）
+POST http://localhost:8123/api/space/add
+Content-Type: application/json
+Cookie: {{adminCookie}}
+
+{
+  "spaceName": "测试私有空间",
+  "spaceLevel": 2,
+  "spaceType": 0
+}
+
+> {%
+    client.global.set("privateSpaceId", JSON.parse(response.body.toString()).data.toString());
+    client.log("privateSpaceId: " + client.global.get("privateSpaceId"));
+%}
+
+### 3.2 创建团队空间（管理员）
+POST http://localhost:8123/api/space/add
+Content-Type: application/json
+Cookie: {{adminCookie}}
+
+{
+  "spaceName": "测试团队空间",
+  "spaceLevel": 2,
+  "spaceType": 1
+}
+
+> {%
+    client.global.set("teamSpaceId", JSON.parse(response.body.toString()).data.toString());
+    client.log("teamSpaceId: " + client.global.get("teamSpaceId"));
+%}
+
+
+### ============================================================
+### 第四阶段：上传图片
+### ============================================================
+
+### 4.1 上传图片到公共图库（管理员）
+POST http://localhost:8123/api/picture/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+Cookie: {{adminCookie}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="test.png"
+
+< 11.png
+--WebAppBoundary
+Content-Disposition: form-data; name="picName"
+
+test_public
+--WebAppBoundary--
+
+> {%
+    client.global.set("openPictureId", JSON.parse(response.body.toString()).data.id.toString());
+    client.log("openPictureId: " + client.global.get("openPictureId"));
+%}
+
+### 4.2 上传图片到私有空间（空间创建者）
+POST http://localhost:8123/api/picture/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+Cookie: {{spaceCreatorCookie}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="test.png"
+
+< 11.png
+--WebAppBoundary
+Content-Disposition: form-data; name="picName"
+
+test_private
+--WebAppBoundary
+Content-Disposition: form-data; name="spaceId"
+
+{{privateSpaceId}}
+--WebAppBoundary--
+
+> {%
+    client.global.set("privatePictureId", JSON.parse(response.body.toString()).data.id.toString());
+    client.log("privatePictureId: " + client.global.get("privatePictureId"));
+%}
+
+### 4.3 上传图片到团队空间（空间创建者）
+POST http://localhost:8123/api/picture/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+Cookie: {{spaceCreatorCookie}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="test.png"
+
+< 11.png
+--WebAppBoundary
+Content-Disposition: form-data; name="picName"
+
+test_team
+--WebAppBoundary
+Content-Disposition: form-data; name="spaceId"
+
+{{teamSpaceId}}
+--WebAppBoundary--
+
+> {%
+    client.global.set("teamPictureId", JSON.parse(response.body.toString()).data.id.toString());
+    client.log("teamPictureId: " + client.global.get("teamPictureId"));
+%}
+
+
+### ============================================================
+### 第五阶段：往团队空间添加成员
+### ============================================================
+
+### 5.1 添加 editor 用户到团队空间（角色：editor）
+POST http://localhost:8123/api/spaceUser/add
+Content-Type: application/json
+Cookie: {{adminCookie}}
+
+{
+  "userId": {{editorUserId}},
+  "spaceId": {{teamSpaceId}},
+  "spaceRole": "editor"
+}
+
+> {%
+    client.global.set("editorSpaceUserId", JSON.parse(response.body.toString()).data.toString());
+    client.log("editorSpaceUserId: " + client.global.get("editorSpaceUserId"));
+%}
+
+### 5.2 添加 viewer 用户到团队空间（角色：viewer）
+POST http://localhost:8123/api/spaceUser/add
+Content-Type: application/json
+Cookie: {{adminCookie}}
+
+{
+  "userId": {{viewerUserId}},
+  "spaceId": {{teamSpaceId}},
+  "spaceRole": "viewer"
+}
+
+> {%
+    client.global.set("viewerSpaceUserId", JSON.parse(response.body.toString()).data.toString());
+    client.log("viewerSpaceUserId: " + client.global.get("viewerSpaceUserId"));
+%}
+
+### 5.3 添加 addUser 到团队空间（角色：viewer，用于删除/查询测试）
+POST http://localhost:8123/api/spaceUser/add
+Content-Type: application/json
+Cookie: {{adminCookie}}
+
+{
+  "userId": {{addUserId}},
+  "spaceId": {{teamSpaceId}},
+  "spaceRole": "viewer"
+}
+
+> {%
+    client.global.set("teamSpaceUserId", JSON.parse(response.body.toString()).data.toString());
+    client.log("teamSpaceUserId: " + client.global.get("teamSpaceUserId"));
+%}
+
+
+### ============================================================
+### 第六阶段：汇总输出
+### 复制控制台打印的 JSON 到 http-client.env.json 的 dev 对象中
+### ============================================================
+
+### 6.1 打印环境变量汇总
+GET http://localhost:8123/api/user/get/login
+Cookie: {{adminCookie}}
+
+> {%
+    client.log("\n\n========== 复制以下 JSON 到 http-client.env.json 的 dev 对象中 ==========\n");
+    var result = {
+        "adminCookie": client.global.get("adminCookie"),
+        "spaceCreatorCookie": client.global.get("spaceCreatorCookie"),
+        "editorCookie": client.global.get("editorCookie"),
+        "viewerCookie": client.global.get("viewerCookie"),
+        "commonUserCookie": client.global.get("commonUserCookie"),
+        "needUploadFileUrl": "https://picsum.photos/200",
+        "openPictureId": client.global.get("openPictureId"),
+        "privatePictureId": client.global.get("privatePictureId"),
+        "teamPictureId": client.global.get("teamPictureId"),
+        "privateSpaceId": client.global.get("privateSpaceId"),
+        "teamSpaceId": client.global.get("teamSpaceId"),
+        "addUserId": client.global.get("addUserId"),
+        "privateSpaceUserId": client.global.get("editorSpaceUserId"),
+        "teamSpaceUserId": client.global.get("teamSpaceUserId"),
+        "privateSpaceUserSpaceId": client.global.get("privateSpaceId"),
+        "publicPicName": "test_public",
+        "privatePicName": "test_private",
+        "teamPicName": "test_team",
+        "editedName": "edited_name",
+        "searchColor": "#FF0000",
+        "batchNameRulePrivate": "batch_edited_private",
+        "batchNameRuleTeam": "batch_edited_team",
+        "batchTagsPrivate": "private",
+        "batchTagsTeam": "team",
+        "pageSize": "10",
+        "currentPage": "1",
+        "spaceUserRole": "viewer",
+        "spaceUserEditorRole": "editor",
+        "spaceUserViewerRole": "viewer"
+    };
+    client.log(JSON.stringify(result, null, 2));
+    client.log("\n========== 复制结束 ==========\n");
+%}

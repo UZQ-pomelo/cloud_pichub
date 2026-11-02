@@ -16,7 +16,7 @@ import com.pichub.cloud_pichub.service.SpaceUserService;
 import com.pichub.cloud_pichub.service.UserService;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

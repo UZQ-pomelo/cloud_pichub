@@ -11,14 +11,13 @@ import com.pichub.cloud_pichub.manager.websocket.model.PictureEditRequestMessage
 import com.pichub.cloud_pichub.manager.websocket.model.PictureEditResponseMessage;
 import com.pichub.cloud_pichub.model.entity.User;
 import com.pichub.cloud_pichub.service.UserService;
-import groovyjarjarantlr4.v4.runtime.misc.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -195,7 +194,7 @@ public class PictureEditHandler extends TextWebSocketHandler {
      * WebSocket断开连接
      */
     @Override
-    public void afterConnectionClosed(WebSocketSession session, @NotNull CloseStatus status) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         Map<String, Object> attributes = session.getAttributes();
         Long pictureId = (Long) attributes.get("pictureId");
         User user = (User) attributes.get("user");

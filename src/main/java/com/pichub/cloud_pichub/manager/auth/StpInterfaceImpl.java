@@ -6,7 +6,6 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.http.Header;
 import cn.hutool.json.JSONUtil;
@@ -28,8 +27,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.*;
 
 import static com.pichub.cloud_pichub.constant.UserConstant.USER_LOGIN_STATE;
@@ -61,11 +62,16 @@ public class StpInterfaceImpl implements StpInterface {
         String contentType = request.getHeader(Header.CONTENT_TYPE.getValue());
         SpaceUserAuthContext authRequest;
         // 兼容 get 和 post 操作
-        if (ContentType.JSON.getValue().equals(contentType)) {
-            String body = ServletUtil.getBody(request);
+        if (contentType != null && contentType.startsWith(ContentType.JSON.getValue())) {
+            String body = readBody(request);
             authRequest = JSONUtil.toBean(body, SpaceUserAuthContext.class);
         } else {
-            Map<String, String> paramMap = ServletUtil.getParamMap(request);
+            Map<String, String> paramMap = new HashMap<>();
+            request.getParameterMap().forEach((key, values) -> {
+                if (values != null && values.length > 0) {
+                    paramMap.put(key, values[0]);
+                }
+            });
             authRequest = BeanUtil.toBean(paramMap, SpaceUserAuthContext.class);
         }
         // 根据请求路径区分 id 字段的含义
@@ -88,6 +94,20 @@ public class StpInterfaceImpl implements StpInterface {
             }
         }
         return authRequest;
+    }
+
+    private String readBody(HttpServletRequest request) {
+        try (BufferedReader reader = request.getReader()) {
+            StringBuilder body = new StringBuilder();
+            char[] buffer = new char[256];
+            int read;
+            while ((read = reader.read(buffer)) != -1) {
+                body.append(buffer, 0, read);
+            }
+            return body.toString();
+        } catch (IOException e) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "读取请求体失败");
+        }
     }
 
     @Override

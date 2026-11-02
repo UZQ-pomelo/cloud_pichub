@@ -23,7 +23,7 @@ public class ImageSearchApiFacade {
 
     public static void main(String[] args) {
         // 测试以图搜图功能
-        String imageUrl = "https://www.codefather.cn/logo.png";
+        String imageUrl = "https://picsum.photos/200";
         List<ImageSearchResult> resultList = searchImage(imageUrl);
         System.out.println("结果列表" + resultList);
     }

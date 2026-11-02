@@ -15,19 +15,24 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
-  # Redis 配置
-  redis:
-    database: 0
-    host: 127.0.0.1
-    port: 6379
-    timeout: 5000
-  # session 配置
+  # Redis 配置（Spring Boot 3 使用 spring.data.redis）
+  data:
+    redis:
+      database: 0
+      host: 127.0.0.1
+      port: 6379
+      timeout: 5000
+  # session 配置（spring-session-data-redis 自动启用 Redis 存储）
   session:
-    store-type: redis
     # session 30 天过期
     timeout: 2592000
 
-
+# Actuator 健康检查，供后续网关使用
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
 
 # MyBatis-Plus配置
 mybatis-plus:
@@ -43,16 +48,13 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值
     enable-sql-runner: true
 
-
-# 接口文档配置
-knife4j:
-  enable: true
-  openapi:
-    title: "接口文档"
-    version: 1.0
-    group:
-      default:
-        api-rule: package
-        api-rule-resources:
-          - com.pichub.cloud_pichub.controller
-
+# OpenAPI / Swagger UI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  group-configs:
+    - group: default
+      paths-to-match: /**
+      packages-to-scan: com.pichub.cloud_pichub.controller
